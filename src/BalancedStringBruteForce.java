@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 public class BalancedStringBruteForce {
 
     public static boolean isBalanced(String s) {
@@ -13,6 +15,7 @@ public class BalancedStringBruteForce {
         for (int i = 0; i < 26; i++) {
             if (freq[i] > 0) {
                 distinctCount++;
+
                 if (firstFreq == -1) {
                     firstFreq = freq[i];
                 } else if (freq[i] != firstFreq) {
@@ -20,6 +23,7 @@ public class BalancedStringBruteForce {
                 }
             }
         }
+
         return distinctCount == 2;
     }
 
@@ -29,33 +33,33 @@ public class BalancedStringBruteForce {
 
         for (int i = 0; i < n; i++) {
             for (int j = i + 2; j <= n; j++) {
+
                 String sub = s.substring(i, j);
+
                 if (isBalanced(sub)) {
                     maxLen = Math.max(maxLen, sub.length());
                 }
             }
         }
+
         return maxLen;
     }
 
     public static void main(String[] args) {
+
+        Scanner input = new Scanner(System.in);
+
         System.out.println("=== Algorithm 1: Brute Force (Non-Recursive) ===");
         System.out.println();
 
-        runTest("cabbacc", 4);
-        runTest("abababa", 6);
-        runTest("aaaaaaa", 0);
-        runTest("aabbab", 6);
-        runTest("abcabc", 2);
-        runTest("aabb", 4);
-        runTest("ab", 2);
-    }
+        System.out.print("Enter the string: ");
+        String s = input.nextLine();
 
-    private static void runTest(String s, int expected) {
         int result = longestBalancedSubstring(s);
-        String status = (result == expected) ? "PASS" : "FAIL";
 
-        System.out.printf("[%s]  Input: %-12s  Expected: %d  Got: %d%n",
-                status, "\"" + s + "\"", expected, result);
+        System.out.println();
+        System.out.println("Longest Balanced Substring Length = " + result);
+
+        input.close();
     }
 }
