@@ -1,105 +1,68 @@
 public class BalancedStringBacktracking {
 
-    private static String expandRecursive(
-            String s,
-            int start,
-            int end,
-            int[] freq,
-            int distinctCount,
-            String longest
-    ) {
+    private static int maxLen;
+    private static int maxStart;
 
-        if (end > s.length()) {
-            return longest;
-        }
+    private static boolean isBalanced(int[] freq) {
 
-        int charIdx = s.charAt(end - 1) - 'a';
+        int distinctCount = 0;
+        int firstFreq = -1;
 
-        if (freq[charIdx] == 0) {
-            distinctCount++;
-        }
-
-        freq[charIdx]++;
-
-        if (distinctCount > 2) {
-            freq[charIdx]--;
-            return longest;
-        }
-
-        if (distinctCount == 2) {
-
-            int count1 = -1;
-            int count2 = -1;
-
-            for (int k = 0; k < 26; k++) {
-
-                if (freq[k] > 0) {
-
-                    if (count1 == -1) {
-                        count1 = freq[k];
-                    } else {
-                        count2 = freq[k];
-                        break;
-                    }
-                }
-            }
-
-            if (count1 == count2) {
-
-                String current = s.substring(start, end);
-
-                if (current.length() > longest.length()) {
-                    longest = current;
+        for (int f : freq) {
+            if (f > 0) {
+                distinctCount++;
+                if (firstFreq == -1) {
+                    firstFreq = f;
+                } else if (f != firstFreq) {
+                    return false;
                 }
             }
         }
 
-        String result = expandRecursive(
-                s,
-                start,
-                end + 1,
-                freq,
-                distinctCount,
-                longest
-        );
-
-        freq[charIdx]--;
-
-        return result;
+        return distinctCount == 2;
     }
 
-    private static String tryAllStartsRecursive(String s, int start) {
+    private static void backtrack(String s, int start, int end, int[] freq, int n) {
 
-        if (start >= s.length() - 1) {
-            return "";
+        if (n - start < 2) return;
+        if (end > n) return;
+
+        if (end - start >= 2) {
+            if (isBalanced(freq)) {
+                if (end - start > maxLen) {
+                    maxLen = end - start;
+                    maxStart = start;
+                }
+            }
         }
 
-        int[] freq = new int[26];
-
-        String currentBest = expandRecursive(
-                s,
-                start,
-                start + 1,
-                freq,
-                0,
-                ""
-        );
-
-        String nextBest = tryAllStartsRecursive(s, start + 1);
-
-        if (currentBest.length() > nextBest.length()) {
-            return currentBest;
+        if (end < n) {
+            freq[s.charAt(end) - 'a']++;
+            backtrack(s, start, end + 1, freq, n);
+            freq[s.charAt(end) - 'a']--;
         }
 
-        return nextBest;
+        if (end == n) {
+            int[] newFreq = new int[26];
+            newFreq[s.charAt(start + 1) - 'a']++;
+            backtrack(s, start + 1, start + 2, newFreq, n);
+        }
     }
 
     public static String longestBalancedSubstring(String s) {
 
-        if (s == null || s.length() < 2) {
-            return "";
-        }
+        if (s == null || s.length() < 2) return "";
 
-        return tryAllStartsRecursive(s, 0);
+        maxLen = 0;
+        maxStart = -1;
+
+        int[] initialFreq = new int[26];
+        initialFreq[s.charAt(0) - 'a']++;
+        initialFreq[s.charAt(1) - 'a']++;
+
+        backtrack(s, 0, 2, initialFreq, s.length());
+
+        if (maxLen == 0) return "";
+        return s.substring(maxStart, maxStart + maxLen);
     }
 }
